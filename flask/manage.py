@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 
 
 from app import app, db
-from app.models.greeting import Greet
+from app.models.user import User
 
 cli = FlaskGroup(app)
 
@@ -17,9 +17,20 @@ def create_db():
 
 @cli.command("seed_db")
 def seed_db():
-    db.session.add(
-        Greet(msg="Hello From Flask!")
-    )
+    users_data = [
+        {"username": "string", "email": "string@example.com", "password": "string"},
+        {"username": "user1", "email": "user1@example.com", "password": "password1"},
+        {"username": "user2", "email": "user2@example.com", "password": "password2"},
+    ]
+
+    for user_data in users_data:
+        user = User(
+            username=user_data["username"],
+            email=user_data["email"],
+            password=user_data["password"],
+            email_confirmed=False,
+        )
+        db.session.add(user)
     db.session.commit()
 
 
