@@ -1,0 +1,29 @@
+version: "3.9"
+name: "flask-app"
+services:
+  flask:
+    container_name: flask
+    build: flask
+    ports:
+      - "56733:8000"
+    volumes:
+      - ./flask:/flask_app
+    env_file:
+      - .env.dev
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres
+    image: postgres:13-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_flask
+      - POSTGRES_PASSWORD=hello_flask
+      - POSTGRES_DB=hello_flask_dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
