@@ -15,21 +15,25 @@ from flask_jwt_extended import (
 )
 
 from app import app, db
-from app.models.user import User
-
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.login_view = "login"  # Specify the view for login
-login_manager.init_app(app)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    # Load and return a user from the database based on the user_id
-    return User.query.get(int(user_id))
-
+from app.models.user import User, RolesUsers, Role
 
 api = Api(app)
+
+
+@api.route("/roles_users")
+class RolesUser(Resource):
+    def get(self):
+        res = RolesUsers.query.all()
+        return [r.to_dict() for r in res], 200
+
+
+@api.route("/users")
+class Users(Resource):
+    def get(self):
+        users = User.query.all()
+        user_list = [user.to_dict() for user in users]
+        return user_list, 200
+
 
 login_model = api.model(
     "Login",
@@ -45,39 +49,6 @@ class Login(Resource):
     @cross_origin(origin="*", headers=["Content-Type"])
     @api.expect(login_model, validate=True)
     def post(self):
-        """
-        API endpoint for user login.
-
-        This API endpoint allows the user to login.
-
-        Request Body:
-        {
-            "username": "string",
-            "password": "string"
-        }
-
-        Responses:
-        - If login is successful:
-            {
-                "login": true,
-                "access_token": "string"
-            }
-            HTTP status code: 200
-
-        - If login fails due to invalid credentials:
-            {
-                "login": false,
-                "message": "Invalid username or password"
-            }
-            HTTP status code: 401
-
-        - If login fails due to unverified email:
-            {
-                "message": "Email not verified"
-            }
-            HTTP status code: 401
-        """
-
         data = request.get_json()
         username = data["username"]
         password = data["password"]
@@ -95,6 +66,7 @@ class Login(Resource):
                 return jsonify({"message": "Email not verified"}), 401
         return jsonify({"login": False, "message": "Invalid username or password"}), 401
 
+
 register_model = api.model(
     "Register",
     {
@@ -104,44 +76,22 @@ register_model = api.model(
     },
 )
 
+
 @api.route("/register")
 class Register(Resource):
     @cross_origin(origin="*", headers=["Content-Type"])
     @api.expect(register_model, validate=True)
     def post(self):
-        """
-        API endpoint for user registration.
-
-        This API endpoint allows the user to register.
-
-        Request Body:
-        {
-            "username": "string",
-            "email": "string",
-            "password": "string"
-        }
-
-        Responses:
-        - If registration is successful:
-            {
-                "message": "Registration successful"
-            }
-            HTTP status code: 200
-
-        - If registration fails due to existing username or email:
-            {
-                "message": "Username or email already exists"
-            }
-            HTTP status code: 400
-        """
-
         data = request.get_json()
         username = data["username"]
         email = data["email"]
         password = data["password"]
 
         # Check if username or email already exists
-        if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
+        if (
+            User.query.filter_by(username=username).first()
+            or User.query.filter_by(email=email).first()
+        ):
             return jsonify({"message": "Username or email already exists"}), 400
 
         # Create a new user
@@ -151,49 +101,44 @@ class Register(Resource):
 
         return jsonify({"message": "Registration successful"}), 200
 
+
 @api.route("/logout", methods=["POST"])
 class Logout(Resource):
     @cross_origin(origin="*", headers=["Content-Type", "Authorization"])
     @jwt_required()
     def post(self):
-        """
-        API endpoint for user logout.
-
-        This API endpoint allows the user to logout.
-
-        Responses:
-        - If logout is successful:
-            {
-                "message": "Logout successful"
-            }
-            HTTP status code: 200
-        """
-
         response = jsonify({"message": "Logout successful"})
         unset_jwt_cookies(response)
         return response, 200
 
+role_model = api.model(
+    "Role",
+    {
+        "name": fields.String(required=True, description="Role name"),
+    },
+)
 
-@api.route("/users")
-class Users(Resource):
+@api.route("/roles")
+class Roles(Resource):
     def get(self):
-        """
-        API endpoint to retrieve all users.
+        roles = Role.query.all()
+        role_list = [role.to_dict() for role in roles]
+        return role_list, 200
 
-        Returns:
-        - List of users:
-            [
-                {
-                    "id": 1,
-                    "username": "user1",
-                    "email": "user1@example.com",
-                    "verified": False
-                },
-                ...
-            ]
-            HTTP status code: 200
-        """
+    @cross_origin(origin="*", headers=["Content-Type"])
+    @jwt_required()
+    @api.expect(role_model, validate=True)
+    def post(self):
+        data = request.get_json()
+        name = data["name"]
 
-        users = User.query.all()
-        user_list = [user.to_dict() for user in users]
-        return user_list, 200
+        # Check if role already exists
+        if Role.query.filter_by(name=name).first():
+            return jsonify({"message": "Role already exists"}), 400
+
+        # Create a new role
+        new_role = Role(name=name)
+        db.session.add(new_role)
+        db.session.commit()
+
+        return jsonify({"message": "Role created successfully"}), 200

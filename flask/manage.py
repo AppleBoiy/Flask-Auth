@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 
 
 from app import app, db
-from app.models.user import User
+from app.models.user import User, Role, RolesUsers
 
 cli = FlaskGroup(app)
 
@@ -14,30 +14,43 @@ def create_db():
     db.create_all()
     db.session.commit()
 
+
 @cli.command("seed_db")
 def seed_db():
-    # Manually adding users
-    user1 = User(
-        username="string",
-        email="string@example.com",
-        password="string",
-    )
-    user1.verified()
-    db.session.add(user1)
+    # Create roles
+    roles_data = [
+        {"name": "admin", "description": "Administrator"},
+        {"name": "user", "description": "Regular User"},
+    ]
+    roles = [Role(**data) for data in roles_data]
+    db.session.bulk_save_objects(roles)
+    db.session.commit()
 
-    user2 = User(
-        username="user1",
-        email="user1@example.com",
-        password="password1",
-    )
-    db.session.add(user2)
+    # Create users
+    users_data = [
+        {
+            "email": "admin@example.com",
+            "username": "admin",
+            "password": "admin_password",
+            "active": True
+        },
+        {
+            "email": "user@example.com",
+            "username": "user",
+            "password": "user_password",
+            "active": True
+        },
+    ]
+    users = [User(**data) for data in users_data]
+    db.session.bulk_save_objects(users)
 
-    user3 = User(
-        username="user2",
-        email="user2@example.com",
-        password="password2",
-    )
-    db.session.add(user3)
+    # Create roles_users records
+    roles_users_data = [
+        {"user_id": 1, "role_id": 1},  # admin user with admin role
+        {"user_id": 2, "role_id": 2},  # user user with user role
+    ]
+    roles_users = [RolesUsers(**data) for data in roles_users_data]
+    db.session.bulk_save_objects(roles_users)
 
     db.session.commit()
 

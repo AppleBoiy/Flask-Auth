@@ -1,46 +1,52 @@
 from app import db
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_security import UserMixin, RoleMixin
+from sqlalchemy.orm import relationship, backref
+
+class Role(db.Model, RoleMixin):
+    __tablename__ = "role"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+    def to_dict(self):
+        return {"id": self.id, "name": self.name, "description": self.description}
 
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
-
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    _password_hash = db.Column(db.String, nullable=False)
-    _email_verified = db.Column(db.Boolean, default=False)
-
-    @property
-    def password(self):
-        raise AttributeError("password is not a readable attribute")
-
-    @property
-    def is_verified(self):
-        return self._email_verified
-
-    def verified(self):
-        self._email_verified = True
-        db.session.commit()
-
-    @password.setter
-    def password(self, password):
-        self._password_hash = generate_password_hash(password)
-
-    def get_id(self):
-        return str(self.id)
-
-    def verify_password(self, password):
-        return check_password_hash(self._password_hash, password)
+    email = db.Column(db.String(255), unique=True)
+    username = db.Column(db.String(255), unique=True, nullable=True)
+    password = db.Column(db.String(255), nullable=False)
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer)
+    active = db.Column(db.Boolean())
+    premium = db.Column(db.Boolean())
+    fs_uniquifier = db.Column(db.String(255), unique=True)
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship(
+        "Role", secondary="roles_users", backref=backref("users", lazy="dynamic")
+    )
 
     def to_dict(self):
-        return {
+        user_dict = {
             "id": self.id,
-            "username": self.username,
             "email": self.email,
-            "verified": self._email_verified,
+            "username": self.username,
+            "role": self.roles,
+            "last_login_at": self.last_login_at,
+            "confirmed_at": self.confirmed_at,
         }
+        return user_dict
 
-    def __repr__(self):
-        return f"<User {self.username}>"
+class RolesUsers(db.Model):
+    __tablename__ = "roles_users"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    role_id = db.Column(db.Integer, db.ForeignKey("role.id"))
+
+    def to_dict(self):
+        return {"id": self.id, "user_id": self.user_id, "role_id": self.role_id}
