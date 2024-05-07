@@ -14,23 +14,31 @@ def create_db():
     db.create_all()
     db.session.commit()
 
-
 @cli.command("seed_db")
 def seed_db():
-    users_data = [
-        {"username": "string", "email": "string@example.com", "password": "string"},
-        {"username": "user1", "email": "user1@example.com", "password": "password1"},
-        {"username": "user2", "email": "user2@example.com", "password": "password2"},
-    ]
+    # Manually adding users
+    user1 = User(
+        username="string",
+        email="string@example.com",
+        password="string",
+    )
+    user1.verified()
+    db.session.add(user1)
 
-    for user_data in users_data:
-        user = User(
-            username=user_data["username"],
-            email=user_data["email"],
-            password=user_data["password"],
-            email_confirmed=False,
-        )
-        db.session.add(user)
+    user2 = User(
+        username="user1",
+        email="user1@example.com",
+        password="password1",
+    )
+    db.session.add(user2)
+
+    user3 = User(
+        username="user2",
+        email="user2@example.com",
+        password="password2",
+    )
+    db.session.add(user3)
+
     db.session.commit()
 
 
