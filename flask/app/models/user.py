@@ -36,7 +36,6 @@ class User(db.Model, UserMixin):
             "id": self.id,
             "email": self.email,
             "username": self.username,
-            "role": self.roles,
             "last_login_at": self.last_login_at,
             "confirmed_at": self.confirmed_at,
         }
