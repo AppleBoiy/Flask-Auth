@@ -1,5 +1,7 @@
 # Flask Authentication
 
+<img src="screenshot.png">
+
 Flask Authentication is a project that provides a basic authentication system built with Flask, a micro web framework for Python. It includes endpoints for user login and retrieving user information.
 
 
