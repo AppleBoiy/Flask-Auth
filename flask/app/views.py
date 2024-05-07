@@ -95,12 +95,11 @@ class Login(Resource):
                 return jsonify({"message": "Email not verified"}), 401
         return jsonify({"login": False, "message": "Invalid username or password"}), 401
 
-
-@api.route("/logout")
+@api.route("/logout", methods=["POST"])
 class Logout(Resource):
     @cross_origin(origin="*", headers=["Content-Type", "Authorization"])
     @jwt_required()
-    def get(self):
+    def post(self):
         """
         API endpoint for user logout.
 
