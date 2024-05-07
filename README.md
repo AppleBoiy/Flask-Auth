@@ -29,7 +29,7 @@ Flask Authentication is a project that provides a basic authentication system bu
    make build
    ```
    
-   Application should now be accessible at http://localhost:8000.
+   Application should now be accessible at http://localhost:56733.
 
 ## API Endpoints
 
