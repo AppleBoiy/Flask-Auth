@@ -37,6 +37,7 @@ Flask Authentication is a project that provides a basic authentication system bu
 
 - **POST /login**: User login.
 - **POST /logout**: User logout.
+- **POST /register**: Create new user.
 - **GET /users**: Retrieve all users.
 
 ## License

@@ -95,6 +95,62 @@ class Login(Resource):
                 return jsonify({"message": "Email not verified"}), 401
         return jsonify({"login": False, "message": "Invalid username or password"}), 401
 
+register_model = api.model(
+    "Register",
+    {
+        "username": fields.String(required=True, description="User name"),
+        "email": fields.String(required=True, description="User email"),
+        "password": fields.String(required=True, description="User password"),
+    },
+)
+
+@api.route("/register")
+class Register(Resource):
+    @cross_origin(origin="*", headers=["Content-Type"])
+    @api.expect(register_model, validate=True)
+    def post(self):
+        """
+        API endpoint for user registration.
+
+        This API endpoint allows the user to register.
+
+        Request Body:
+        {
+            "username": "string",
+            "email": "string",
+            "password": "string"
+        }
+
+        Responses:
+        - If registration is successful:
+            {
+                "message": "Registration successful"
+            }
+            HTTP status code: 200
+
+        - If registration fails due to existing username or email:
+            {
+                "message": "Username or email already exists"
+            }
+            HTTP status code: 400
+        """
+
+        data = request.get_json()
+        username = data["username"]
+        email = data["email"]
+        password = data["password"]
+
+        # Check if username or email already exists
+        if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
+            return jsonify({"message": "Username or email already exists"}), 400
+
+        # Create a new user
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({"message": "Registration successful"}), 200
+
 @api.route("/logout", methods=["POST"])
 class Logout(Resource):
     @cross_origin(origin="*", headers=["Content-Type", "Authorization"])
