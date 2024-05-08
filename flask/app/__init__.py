@@ -1,22 +1,42 @@
-import os
 import logging
+import os
 from datetime import timedelta
 
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_mailman import Mail
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
 
 # Configuration
+
 app.config["DEBUG"] = os.getenv("FLASK_DEBUG", True)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "your_secret_key")
 app.config["JSON_AS_ASCII"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite://")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "0aedgaii451cef0af8bd6432ec4b317c8999a9f8g77f5f3cb49fb9a8acds51d"
+)
+app.config["SECURITY_PASSWORD_SALT"] = os.environ.get(
+    "SECURITY_PASSWORD_SALT",
+    "ab3d3a0f6984c4f5hkao41509b097a7bd498e903f3c9b2eea667h16",
+)
+app.config["SECURITY_REGISTERABLE"] = True
+app.config["SECURITY_CONFIRMABLE"] = True
+
+app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")
+app.config["MAIL_PORT"] = os.environ.get("MAIL_PORT")
+app.config["MAIL_USE_SSL"] = False
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+mail = Mail(app)
+
 
 # JWT Configuration
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "your_jwt_secret_key")
@@ -70,7 +90,8 @@ logging.basicConfig(
 app.logger.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
 
 # Database Initialization
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+db.init_app(app)
 
 # Include views after app initialization
 from app import views
