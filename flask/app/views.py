@@ -12,7 +12,14 @@ from app.models.user import User, Role
 
 api = Api(app)
 
+
+class ExtendedRegisterForm(RegisterForm):
+    first_name = StringField('First Name', [DataRequired()])
+    last_name = StringField('Last Name', [DataRequired()])
+
+
 user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)
+# security = Security(app, user_datastore, register_form=ExtendedRegisterForm)
 security = Security(app, user_datastore)
 
 
@@ -37,7 +44,6 @@ class SearchUser(Resource):
             return {"message": "User not found"}, 404
 
 
-# Define the user model for the input data
 user_edit_model = api.model(
     "UserEdit",
     {
