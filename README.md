@@ -35,10 +35,67 @@ Flask Authentication is a project that provides a basic authentication system bu
 
 ## API Endpoints
 
-- **POST /login**: User login.
-- **POST /logout**: User logout.
-- **POST /register**: Create new user.
-- **GET /users**: Retrieve all users.
+### View all users
+
+```
+GET /users
+```
+
+Response:
+
+```json
+[
+   {
+      "id": 1,
+      "email": "user1@example.com",
+      "confirmed_at": "2024-05-08T12:00:00"
+   },
+   {
+      "id": 2,
+      "email": "user2@example.com",
+      "confirmed_at": "2024-05-08T12:00:00"
+   }
+]
+```
+
+### Search for a user by ID
+
+```
+GET /users/<user_id>
+```
+
+Response:
+
+```json
+{
+   "id": 1,
+   "email": "user1@example.com",
+   "confirmed_at": "2024-05-08T12:00:00"
+}
+```
+
+### Edit user information
+
+```
+PUT /users/<user_id>/edit
+```
+
+Request body (JSON):
+
+```json
+{
+   "first_name": "John",
+   "last_name": "Doe"
+}
+```
+
+Response:
+
+```json
+{
+   "message": "User information updated successfully"
+}
+```
 
 ## License
 

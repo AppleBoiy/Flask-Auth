@@ -45,6 +45,7 @@ class User(db.Model, UserMixin):
         }
         return user_dict
 
+
 class RolesUsers(db.Model):
     __tablename__ = "roles_users"
     id = Column(Integer(), primary_key=True)
@@ -53,4 +54,3 @@ class RolesUsers(db.Model):
 
     def to_dict(self):
         return {"id": self.id, "user_id": self.user_id, "role_id": self.role_id}
-
