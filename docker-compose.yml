@@ -1,8 +1,8 @@
 version: "3.9"
-name: "flask-app"
+name: "flask-auth"
 services:
   flask:
-    container_name: flask
+    container_name: flask-auth-app
     build: flask
     ports:
       - "56733:8000"
@@ -13,7 +13,7 @@ services:
     depends_on:
       - postgres
   postgres:
-    container_name: postgres
+    container_name: flask-auth-database
     image: postgres:13-alpine
     ports:
       - "5432:5432"
