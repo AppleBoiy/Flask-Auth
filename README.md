@@ -1,14 +1,15 @@
 # Flask Authentication
 
-<img src="screenshot.png">
+![screenshot](screenshot.png)
 
 Flask-based RESTful API for managing users.
 
-## Table of Contents
+## Features
 
-- [Installation](#installation)
-- [API Endpoints](#api-endpoints)
-- [License](#license)
+- **Login**: Allows users to authenticate and access protected resources.
+- **Register**: Token-based authentication with email verification for new user registration.
+- **Reset Password**: Password reset functionality via email for user accounts.
+- **Change Password**: Ability for users to change their password, authenticated via email.
 
 ## Installation
 
@@ -29,72 +30,16 @@ Flask-based RESTful API for managing users.
    ```bash
    make build
    ```
-   
-   Application should now be accessible at http://localhost:56733.
 
-## API Endpoints
+   The application should now be accessible at [http://localhost:56733](http://localhost:56733).
 
-### View all users
+## Usage
 
-```
-GET /users
-```
+### Sample Requests
 
-Response:
+You can use Postman to interact with the API. For detailed examples and to explore the API endpoints, please refer.
 
-```json
-[
-   {
-      "id": 1,
-      "email": "user1@example.com",
-      "confirmed_at": "2024-05-08T12:00:00"
-   },
-   {
-      "id": 2,
-      "email": "user2@example.com",
-      "confirmed_at": "2024-05-08T12:00:00"
-   }
-]
-```
-
-### Search for a user by ID
-
-```
-GET /users/<user_id>
-```
-
-Response:
-
-```json
-{
-   "id": 1,
-   "email": "user1@example.com",
-   "confirmed_at": "2024-05-08T12:00:00"
-}
-```
-
-### Edit user information
-
-```
-PUT /users/<user_id>/edit
-```
-
-Request body (JSON):
-
-```json
-{
-   "first_name": "John",
-   "last_name": "Doe"
-}
-```
-
-Response:
-
-```json
-{
-   "message": "User information updated successfully"
-}
-```
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/27963483-a2ef16ea-7f10-45bb-9f98-a9d658532a51?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D27963483-a2ef16ea-7f10-45bb-9f98-a9d658532a51%26entityType%3Dcollection%26workspaceId%3D71a69b4d-4cfd-4e21-bba4-76c30dafb56c)
 
 ## License
 
